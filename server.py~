@@ -40,26 +40,31 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 	verb = ""
 	directory = "/"
 	protocol = "HTTP/1.1"
-	mimetype = "text/html"
+	mimetype = ""
 	outString = ""
+	
 	for i in range(0,len(request)):
 		if (request[i][:4] == "GET "):
 			attributes = request[i].split(" ")
 			verb = attributes[0]
 			directory = attributes[1]
 			protocol = attributes[2]
-		elif (request[i][:12].lower() == "content-type"):
-			attributes = request[i].replace(" ","")
-			attributes = attributes.split(":")
-			mimetype = attributes[1]
+		##elif (request[i][:12].lower() == "content-type"):
+		##	attributes = request[i].replace(" ","")
+		##	attributes = attributes.split(":")
+		##	mimetype = attributes[1]
+	
 	if(directory[-1] == "/"):
-		if (mimetype == "text/html"):
-			directory = directory + "index.html"
-		elif (mimetype == "text/css"):
-			directory = directory + "index.css"
-		else:
-			pass
-	directory = "www" + directory	
+		directory = directory + "index.html"
+		mimetype = "text/html"
+	elif(directory[-5:] == ".html"):
+		mimetype = "text/html"
+	elif(directory[-4:] == ".css"):
+		mimetype = "text/css"
+	else:
+		directory = directory + "/"
+	
+	directory = "www" + directory 	
 	directory = directory.split("/")
 	fileExist = True
 	finalDepth = 0
@@ -87,7 +92,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 			fileExist = False
 		if (depth <= 0):
 			fileExist = False
-		print("Path %s , %i : %s", path, finalDepth, exists)
+		print(path, finalDepth, exists)
 	
 	if (fileExist == False):
 		return False
@@ -109,14 +114,11 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 			finalDepth = depth
 		
 		newfile = open(path, "r")
+		outString = "Content-Type:" + mimetype + "\r\n\r\n"
 		for line in newfile.readlines():
 			outString = outString + line
 		return outString
 
-	print (exists)	
-    	print (verb)
-	print (directory)
-	print (mimetype)
 
     def handle(self):
         self.data = self.request.recv(1024).strip()
@@ -125,11 +127,13 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 	print(output)
 	if (output == False):
 		print("404 Status Sent")
-		self.request.sendall("HTTP/1.1 404 NOT FOUND\r\n\r\n")
+		self.request.sendall("HTTP/1.1 404 NOT FOUND\r\n")
+		self.request.sendall("Status-Code:404\r\n")
 		self.request.sendall("<h1>404: It appears the page you are looking for does not exist</h1>\r\n\r\n")
 		
 	else:
-		self.request.sendall("HTTP/1.1 200 OK\r\n\r\n")
+		
+		self.request.sendall("HTTP/1.1 200 OK\r\n")
 		self.request.sendall(output)
 	
     
