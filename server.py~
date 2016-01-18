@@ -4,6 +4,7 @@ import SocketServer
 import os.path
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
+# Modified 2016 James Cadek
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,8 +29,6 @@ import os.path
 
 # try: curl -v -X GET http://127.0.0.1:8080/
 
-# referenced the following document on file parsing:
-# http://www.dotnetperls.com/file-python
 class MyWebServer(SocketServer.BaseRequestHandler):
 
     def parseRequest(self, request):
@@ -43,16 +42,20 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 	mimetype = ""
 	outString = ""
 	
+	#Filter lines and search for specific headers
 	for i in range(0,len(request)):
+		#Pull Get request
 		if (request[i][:4] == "GET "):
 			attributes = request[i].split(" ")
 			verb = attributes[0]
 			directory = attributes[1]
 			protocol = attributes[2]
-		##elif (request[i][:12].lower() == "content-type"):
-		##	attributes = request[i].replace(" ","")
-		##	attributes = attributes.split(":")
-		##	mimetype = attributes[1]
+		
+		# Unused code that would parse out Content-Type Header
+		#elif (request[i][:12].lower() == "content-type"):
+		#	attributes = request[i].replace(" ","")
+		#	attributes = attributes.split(":")
+		#	mimetype = attributes[1]
 	
 	if(directory[-1] == "/"):
 		directory = directory + "index.html"
