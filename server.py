@@ -140,7 +140,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 	if (output == False):
 		print("404 Status Sent")
 		self.request.sendall("HTTP/1.1 404 NOT FOUND\r\n")
-		self.request.sendall("Status-Code:404\r\n")
+		self.request.sendall("Status-Code:404\r\n\r\n")
 		self.request.sendall("<h1>404: It appears the page you are looking for does not exist</h1>\r\n\r\n")
 		
 	else:
